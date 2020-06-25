@@ -1,0 +1,252 @@
+# ===================================================================
+# Spring Boot configuration.
+#
+# This configuration will be overridden by the Spring profile you use,
+# for example application-dev.yml if you use the "dev" profile.
+#
+# More information on profiles: https://www.jhipster.tech/profiles/
+# More information on configuration properties: https://www.jhipster.tech/common-application-properties/
+# ===================================================================
+   
+# ===================================================================
+# Standard Spring Boot properties.
+# Full reference is available at:
+# http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+# ===================================================================
+
+eureka:
+  client:
+    enabled: true
+    healthcheck:
+      enabled: true
+    fetch-registry: true
+    register-with-eureka: true
+    instance-info-replication-interval-seconds: 10
+    registry-fetch-interval-seconds: 10
+  instance:
+    appname: payment
+    instanceId: payment:${spring.application.instance-id:${random.value}}
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10
+    status-page-url-path: ${management.endpoints.web.base-path}/info
+    health-check-url-path: ${management.endpoints.web.base-path}/health
+    metadata-map:
+      zone: primary # This is needed for the load balancer
+      profile: ${spring.profiles.active}
+      version: #project.version#
+      git-version: ${git.commit.id.describe:}
+      git-commit: ${git.commit.id.abbrev:}
+      git-branch: ${git.branch:}
+ribbon:
+  eureka:
+    enabled: true
+feign:
+  hystrix:
+    enabled: false
+  # client:
+  #     config:
+  #         default:
+  #             connectTimeout: 5000
+  #             readTimeout: 5000
+
+# See https://github.com/Netflix/Hystrix/wiki/Configuration
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          strategy: SEMAPHORE
+          # See https://github.com/spring-cloud/spring-cloud-netflix/issues/1330
+          thread:
+              timeoutInMilliseconds: 999999999999999999999999999999
+  shareSecurityContext: true
+
+management:
+  endpoints:
+    web:
+      base-path: /management
+      exposure:
+        include: ['configprops', 'env', 'health', 'info', 'jhimetrics', 'logfile', 'loggers', 'prometheus', 'threaddump']
+  endpoint:
+    health:
+      show-details: when-authorized
+      roles: 'ROLE_ADMIN'
+    jhimetrics:
+      enabled: true
+  info:
+    git:
+      mode: full
+  health:
+    mail:
+      enabled: false # When using the MailService, configure an SMTP server and set this to true
+  metrics:
+    export:
+      # Prometheus is the default metrics backend
+      prometheus:
+        enabled: true
+        step: 60
+    enable:
+      http: true
+      jvm: true
+      logback: true
+      process: true
+      system: true
+    distribution:
+      percentiles-histogram:
+        all: true
+      percentiles:
+        all: 0, 0.5, 0.75, 0.95, 0.99, 1.0
+    tags:
+      application: ${spring.application.name}
+    web:
+      server:
+        auto-time-requests: true
+
+spring:
+  autoconfigure:
+    exclude: org.springframework.boot.actuate.autoconfigure.metrics.jdbc.DataSourcePoolMetricsAutoConfiguration,org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchAutoConfiguration,org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchDataAutoConfiguration
+  application:
+    name: payment
+  jmx:
+    enabled: false
+  data:
+    jpa:
+      repositories:
+        bootstrap-mode: deferred
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate.jdbc.time_zone: UTC
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+  messages:
+    basename: i18n/messages
+  main:
+    allow-bean-definition-overriding: true
+  mvc:
+    favicon:
+      enabled: false
+  task:
+    execution:
+      thread-name-prefix: payment-task-
+      pool:
+        core-size: 2
+        max-size: 50
+        queue-capacity: 10000
+    scheduling:
+      thread-name-prefix: payment-scheduling-
+      pool:
+        size: 2
+  thymeleaf:
+    mode: HTML
+  output:
+    ansi:
+      console-available: true
+  security:
+    oauth2:
+      client:
+        provider:
+          oidc:
+            issuer-uri: https://dev.servers.divisosofttech.com/auth/realms/graeshoppe
+        registration:
+          oidc:
+            client-id: account
+            client-secret: d4f03412-cdad-45b0-9ccc-beddd8399ac5
+      paypal:
+         access-token-uri: https://api.sandbox.paypal.com/v1/oauth2/token   
+         client-id: AT-ve5Q8n8igYEs1o_kWoVNY2DLKCam50aILd3f61qhuweZdvAr-iPDw83vNWhLWpcITvR-rWsOmZDTt
+         client-secret: EHSEgP9EiyboU9CJS9xU_Wd3taJGa86bom7LOtxg6BEvyiKbZ9uwRj9fivAlvIaIn_Gu5LB72QwsNwaS
+         grantType: client_credentials
+
+server:
+  servlet:
+    session:
+      cookie:
+        http-only: true
+
+# Properties to be exposed on the /info management endpoint
+info:
+  # Comma separated list of profiles that will trigger the ribbon to show
+  display-ribbon-on-profiles: 'dev'
+
+# ===================================================================
+# JHipster specific properties
+#
+# Full reference is available at: https://www.jhipster.tech/common-application-properties/
+# ===================================================================
+
+jhipster:
+  clientApp:
+    name: 'paymentApp'
+  # By default CORS is disabled. Uncomment to enable.
+  # cors:
+  #     allowed-origins: "*"
+  #     allowed-methods: "*"
+  #     allowed-headers: "*"
+  #     exposed-headers: "Authorization,Link,X-Total-Count"
+  #     allow-credentials: true
+  #     max-age: 1800
+  mail:
+    from: payment@localhost
+  swagger:
+    default-include-pattern: /api/.*
+    title: payment API
+    description: payment API documentation
+    version: 0.0.1
+    terms-of-service-url:
+    contact-name:
+    contact-url:
+    contact-email:
+    license:
+    license-url:
+  security:
+    oauth2:
+      audience:
+        - account
+        - api://default
+kafka:
+  #bootstrap-servers: localhost:9092
+  #consumer:
+    #key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    #value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    #group.id: payment
+    #auto.offset.reset: earliest
+  producer:
+    key.serializer: org.apache.kafka.common.serialization.StringSerializer
+    value.serializer: com.diviso.graeshoppe.payment.config.SerdeConfig
+    bootstrap.servers: dev.servers.divisosofttech.com:9092
+# ===================================================================
+# Application specific properties
+# Add your own application properties here, see the ApplicationProperties class
+# to have type-safe configuration, like in the JHipsterProperties above
+#
+# More documentation is available at:
+# https://www.jhipster.tech/common-application-properties/
+# ===================================================================
+
+# application:
+topic:
+   payment:
+      destination: paymentx
+   notification:
+      destination: notificationx
+
+bpmn:
+   url: http://dev.servers.divisosofttech.com/activiti-rest/service
+   security:
+      basicAuth:
+         username: kermit
+         password: kermit
+razorPay:
+   security:
+      basicAuth:
+         key: rzp_test_ZR203rhDh9RWHf
+         secret: 7wLOdFABdT3YP7lmBlxJpQ5c
+braintree:
+   merchantId: xhw6pfjdjbh249ms
+   publicKey: 9gbgbk3ch9mwjb5s
+   privateKey: 64e7d4fb49147bbb0f5e12690c8ab9b3
+   environment: sandbox

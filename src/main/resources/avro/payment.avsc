@@ -1,0 +1,21 @@
+
+  {
+	"namespace":"com.diviso.graeshoppe.payment.avro",
+	"name":"Payment",
+	"type":"record",
+	"fields":[
+			   {"name":"id","type":"long"},
+			   {"name":"ref","type":["null","string"]},
+			   {"name":"payee","type":["null","string"]},
+			   {"name":"payer","type":["null","string"]},
+			   {"name":"targetId","type":["null","string"]},
+			   {"name":"paymentType","type":["null","string"]},
+			   {"name":"provider","type":["null","string"],"default":null},
+			   {"name":"amount","type":"double"},
+			   {"name":"tax","type":["null","double"],"default":0.0},
+			   {"name":"total","type":"double"},
+			   {"name":"status","type":["null","string"]},
+    		   {"name":"dateAndTime", "type":"long","logicalType":"date"}
+			]
+	}
+	
